@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import ImageGalleryItem from 'components/ImageGalleryItem/ImageGalleryItem';
 import { ImageGalleryContainer } from 'components/ImageGallery/ImageGallery.styled';
 
-function ImageGallery({ data, modalClick }) {
+const ImageGallery = ({ data, modalClick }) => {
   return (
     <ImageGalleryContainer>
       {data.map(item => (
@@ -10,7 +10,7 @@ function ImageGallery({ data, modalClick }) {
       ))}
     </ImageGalleryContainer>
   );
-}
+};
 
 ImageGallery.propTypes = {
   data: PropTypes.arrayOf(

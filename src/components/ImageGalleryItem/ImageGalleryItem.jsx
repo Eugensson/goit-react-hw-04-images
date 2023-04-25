@@ -4,13 +4,13 @@ import {
   GalleryItemImage,
 } from 'components/ImageGalleryItem/ImageGalleryItem.styled';
 
-function ImageGalleryItem({ item, modalClick }) {
+const ImageGalleryItem = ({ item, modalClick }) => {
   return (
     <GalleryItem onClick={() => modalClick(item.largeImageURL)}>
       <GalleryItemImage src={item.webformatURL} alt={item.tags} />
     </GalleryItem>
   );
-}
+};
 
 ImageGalleryItem.propTypes = {
   item: PropTypes.shape({

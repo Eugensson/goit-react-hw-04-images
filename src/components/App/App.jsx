@@ -1,5 +1,4 @@
-import { Component } from 'react';
-import React from 'react';
+import { useState, useEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { fetchImagesWithQuery } from '../../services/api';
@@ -12,83 +11,89 @@ import {
 } from 'components/index';
 import { AppContainer } from 'components/App/App.styled';
 
-class App extends Component {
-  state = {
-    searchQuery: '',
-    data: [],
-    largeImageURL: '',
-    page: 1,
-    showModal: false,
-    loading: false,
-  };
+const App = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [data, setData] = useState([]);
+  const [largeImageURL, setLargeImageURL] = useState('');
+  const [page, setPage] = useState(1);
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  componentDidUpdate(prevProps, prevState) {
-    if (prevState.searchQuery !== this.state.searchQuery) {
-      this.setState({ loading: true });
-      fetchImagesWithQuery(this.state.searchQuery, 1)
-        .then(data => {
-          this.setState({ data, loading: false });
-        })
-        .catch(error => console.log(error));
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const responseData = await fetchImagesWithQuery(searchQuery, 1);
+        setData(responseData);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (searchQuery) {
+      fetchData();
     }
+  }, [searchQuery]);
 
-    if (prevState.page !== this.state.page) {
-      this.setState({ loading: true });
-      fetchImagesWithQuery(this.state.searchQuery, this.state.page)
-        .then(data => {
-          this.setState(prevState => ({
-            data: [...prevState.data, ...data],
-            loading: false,
-          }));
-        })
-        .catch(error => console.log(error));
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const responseData = await fetchImagesWithQuery(searchQuery, page);
+        setData(prevData => [...prevData, ...responseData]);
+        setLoading(false);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    if (page > 1) {
+      fetchData();
     }
-  }
+  }, [searchQuery, page]);
 
-  handleFormSubmit = searchQuery => {
-    this.setState({ searchQuery });
+  const handleFormSubmit = query => {
+    setSearchQuery(query);
+    setPage(1);
   };
 
-  handleLoadMore = () => {
-    this.setState(prevState => ({ page: prevState.page + 1 }));
+  const handleLoadMore = () => {
+    setPage(prevPage => prevPage + 1);
   };
 
-  handleModalClick = largeImageURL => {
-    this.setState({ largeImageURL, showModal: true });
+  const handleModalClick = url => {
+    setLargeImageURL(url);
+    setShowModal(true);
   };
 
-  toggleModal = () => {
-    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  const toggleModal = () => {
+    setShowModal(prevShowModal => !prevShowModal);
   };
 
-  render() {
-    const { data, loading, showModal, largeImageURL } = this.state;
-    return (
-      <AppContainer>
-        <Searchbar onSubmit={this.handleFormSubmit} />
-        <ImageGallery data={data} modalClick={this.handleModalClick} />
-        {loading && <Loader />}
-        {data.length > 0 ? (
-          <LoadMoreButton handleLoadMore={this.handleLoadMore} />
-        ) : null}
-        {showModal && (
-          <Modal largeImageURL={largeImageURL} onClose={this.toggleModal} />
-        )}
-        <ToastContainer
-          position="top-right"
-          autoClose={3000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={false}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="dark"
-        />
-      </AppContainer>
-    );
-  }
-}
+  return (
+    <AppContainer>
+      <Searchbar onSubmit={handleFormSubmit} />
+      <ImageGallery data={data} modalClick={handleModalClick} />
+      {loading && <Loader />}
+      {data.length > 0 && <LoadMoreButton handleLoadMore={handleLoadMore} />}
+      {showModal && (
+        <Modal largeImageURL={largeImageURL} onClose={toggleModal} />
+      )}
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="dark"
+      />
+    </AppContainer>
+  );
+};
 
 export default App;
