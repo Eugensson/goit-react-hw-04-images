@@ -15,6 +15,7 @@ const App = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [data, setData] = useState([]);
   const [largeImageURL, setLargeImageURL] = useState('');
+  const [totalHits, setTotalHits] = useState(0);
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -24,7 +25,8 @@ const App = () => {
       setLoading(true);
       try {
         const responseData = await fetchImagesWithQuery(searchQuery, 1);
-        setData(responseData);
+        setData(responseData.hits);
+        setTotalHits(responseData.totalHits);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -41,7 +43,8 @@ const App = () => {
       setLoading(true);
       try {
         const responseData = await fetchImagesWithQuery(searchQuery, page);
-        setData(prevData => [...prevData, ...responseData]);
+        setData(prevData => [...prevData, ...responseData.hits]);
+        setTotalHits(responseData.totalHits);
         setLoading(false);
       } catch (error) {
         console.log(error);
@@ -76,7 +79,9 @@ const App = () => {
       <Searchbar onSubmit={handleFormSubmit} />
       <ImageGallery data={data} modalClick={handleModalClick} />
       {loading && <Loader />}
-      {data.length > 0 && <LoadMoreButton handleLoadMore={handleLoadMore} />}
+      {data.length > 0 && page < totalHits / 12 && (
+        <LoadMoreButton handleLoadMore={handleLoadMore} />
+      )}
       {showModal && (
         <Modal largeImageURL={largeImageURL} onClose={toggleModal} />
       )}
