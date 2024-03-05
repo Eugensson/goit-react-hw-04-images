@@ -1,68 +1,67 @@
-import { useState } from 'react';
+import { useState } from "react";
 import PropTypes from 'prop-types';
 import { toast } from 'react-toastify';
-import { GoSearch } from 'react-icons/go';
-import {
-  SearchbarContainer,
-  SearchForm,
-  SearchFormButton,
-  SearchFormButtonLabel,
-  SearchFormInput,
-} from 'components/Searchbar/Searchbar.styled';
+import { IconContext } from "react-icons";
+import { MdImageSearch } from "react-icons/md";
+import { FaSearch } from "react-icons/fa";
 
-const Searchbar = props => {
-  const [searchQuery, setSearchQuery] = useState('');
+import { Header, LogoWrapper, Logo, SearchForm, SearchFormBtn, SearchFormInput } from './Searchbar.styled';
 
-  const handleNameChange = e => {
-    setSearchQuery(e.currentTarget.value.trim().toLowerCase());
-  };
+const Searchbar = ({onSubmit}) => {
+    const [searchQuery, setSearchQuery] = useState('');
 
-  const resetForm = () => {
-    setSearchQuery('');
-  };
+    const handleNameChange = e => {
+        setSearchQuery(e.target.value.toLowerCase());
+    };
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    if (searchQuery === '') {
-      toast.info('The input field must not be empty!', {
-        position: 'bottom-left',
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: 'dark',
-      });
-      return;
+    const resetForm = () => {
+        setSearchQuery('');
+    };
+
+    const handleSubmit = e => {
+        e.preventDefault();
+
+        if (searchQuery.trim() === '') {
+            toast.info('The input field must not be empty!', {
+                position: 'bottom-left',
+                autoClose: 3000,
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: 'dark',
+            });
+            return;
+        }
+        
+        onSubmit(searchQuery.trim())
+
+        resetForm();
     }
 
-    props.onSubmit(searchQuery);
-    resetForm();
-  };
+    return (
+        <Header>
+            <LogoWrapper href="/goit-react-hw-03-image-finder">
+                <IconContext.Provider value={{ size: '45px', color: '#ff0000' }}>
+                    <MdImageSearch />
+                </IconContext.Provider>
+                <Logo>Image<span>Finder</span> </Logo>
+            </LogoWrapper>                
+            <SearchForm onSubmit={handleSubmit}>
+                <SearchFormBtn type="submit">
+                    <IconContext.Provider value={{ size: '22px', color: '#000' }}>
+                        <FaSearch />
+                    </IconContext.Provider>                        
+                    </SearchFormBtn>
+                <SearchFormInput type="text" value={searchQuery} onChange={handleNameChange} placeholder="Enter images or photo name"/>
+            </SearchForm>
+        </Header>
+  )
+}
 
-  return (
-    <SearchbarContainer>
-      <SearchForm onSubmit={handleSubmit}>
-        <SearchFormButton type="submit">
-          <SearchFormButtonLabel>
-            <GoSearch />
-          </SearchFormButtonLabel>
-        </SearchFormButton>
-
-        <SearchFormInput
-          value={searchQuery}
-          onChange={handleNameChange}
-          type="text"
-          autoComplete="off"
-          autoFocus
-          placeholder="Search images and photos"
-        />
-      </SearchForm>
-    </SearchbarContainer>
-  );
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 };
-
-Searchbar.propTypes = { onSubmit: PropTypes.func.isRequired };
 
 export default Searchbar;

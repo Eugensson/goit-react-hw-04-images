@@ -1,6 +1,6 @@
 import { Grid } from 'react-loader-spinner';
 
-const Loader = () => {
+function Loader() {
   return (
     <Grid
       height="60"
@@ -17,6 +17,6 @@ const Loader = () => {
       visible={true}
     />
   );
-};
+}
 
 export default Loader;
